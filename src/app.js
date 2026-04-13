@@ -15,20 +15,23 @@ app.get('/orders', (req, res) => {
     let filteredOrders = [...orders];
 
     if (category) {
-        filteredOrders = filteredOrders.filter(o => o.category === category);
+        const categoriesArray = Array.isArray(category) ? category : [category];
+        filteredOrders = filteredOrders.filter(order => categoriesArray.includes(order.category));
     }
+    
     if (dateFrom) {
-        filteredOrders = filteredOrders.filter(o => o.date >= dateFrom);
+        filteredOrders = filteredOrders.filter(order => new Date(order.date) >= new Date(dateFrom));
     }
+    
     if (dateTo) {
-        filteredOrders = filteredOrders.filter(o => o.date <= dateTo);
+        filteredOrders = filteredOrders.filter(order => new Date(order.date) <= new Date(dateTo));
     }
 
     res.json(filteredOrders);
 });
 
 app.get('/orders/:id', (req, res) => {
-    const order = orders.find(o => o.id === req.params.id);
+    const order = orders.find(order => order.id === req.params.id);
     if (order) {
         res.json(order);
     } else {
@@ -37,15 +40,19 @@ app.get('/orders/:id', (req, res) => {
 });
 
 app.post('/orders', (req, res) => {
-    const { date, category, cost } = req.body;
+    const { category, cost } = req.body;
 
-    if (!date || !category || !cost) {
+    if (!category || cost === undefined) {
         return res.status(400).json({ message: "Missing required fields" });
+    }
+
+    if (typeof cost !== 'number') {
+        return res.status(400).json({ message: "Cost must be a number" });
     }
 
     const newOrder = {
         id: Date.now().toString(),
-        date,
+        date: new Date(), 
         category,
         cost
     };
@@ -56,7 +63,7 @@ app.post('/orders', (req, res) => {
 
 app.put('/orders/:id', (req, res) => {
     const { id } = req.params;
-    const index = orders.findIndex(o => o.id === id);
+    const index = orders.findIndex(order => order.id === id);
 
     if (index !== -1) {
         orders[index] = { id, ...req.body };
@@ -68,7 +75,7 @@ app.put('/orders/:id', (req, res) => {
 
 app.patch('/orders/:id', (req, res) => {
     const { id } = req.params;
-    const index = orders.findIndex(o => o.id === id);
+    const index = orders.findIndex(order => order.id === id);
 
     if (index !== -1) {
         orders[index] = { ...orders[index], ...req.body };
@@ -80,10 +87,10 @@ app.patch('/orders/:id', (req, res) => {
 
 app.delete('/orders/:id', (req, res) => {
     const { id } = req.params;
-    const index = orders.findIndex(o => o.id === id);
+    const index = orders.findIndex(order => order.id === id);
 
     if (index !== -1) {
-        orders = orders.filter(o => o.id !== id);
+        orders = orders.filter(order => order.id !== id);
         res.status(204).send();
     } else {
         res.status(404).json({ message: "Order not found" });
