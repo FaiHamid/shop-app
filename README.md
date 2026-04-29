@@ -1,5 +1,5 @@
 # shop-app
-# 🛒 Shop App (CRUD with Express)
+# 🛒 Shop App (CRUD with Express and Sequilize)
 
 ## 🚀 Overview
 
