@@ -1,12 +1,16 @@
 import express from 'express';
+import dotenv from 'dotenv';
+import orderRouter from './routes/orderRouter.js';
 
-const PORT =  process.env.PORT || 8000;
+dotenv.config();
+
+const PORT = process.env.PORT || 8000;
 
 const app = express();
 
-const orders = [];
+app.use(express.json());
 
-//add get, post, put, patch, delete
+app.use('/orders', orderRouter);
 
 app.listen(PORT, () => {
     console.log(`server is running on port ${PORT}`);
