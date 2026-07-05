@@ -1,12 +1,13 @@
 import express from 'express';
+import ordersRoutes from './routes/order.routes.js';
 
 const PORT =  process.env.PORT || 8000;
 
 const app = express();
+app.use(express.json());
 
-const orders = [];
+app.use('/orders', ordersRoutes);
 
-//add get, post, put, patch, delete
 
 app.listen(PORT, () => {
     console.log(`server is running on port ${PORT}`);
